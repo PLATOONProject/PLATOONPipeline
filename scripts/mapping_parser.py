@@ -1,11 +1,7 @@
-import os
-import re
-import csv
 import sys
-import uuid
 import rdflib
-import traceback
 import json
+
 
 def get_linked_to(dic):
 	links = []
@@ -14,14 +10,15 @@ def get_linked_to(dic):
 			links.append(parent_class)
 	return links
 
+
 def get_predicates(dic):
 	predicates = []
 	for predicate in dic["predicates"]:
 		predicates.append(predicate["predicate"])
 	return predicates
 
-def mapping_parser(endpoint, mapping_file):
 
+def mapping_parser(endpoint, mapping_file):
 	"""
 	(Private function, not accessible from outside this package)
 
@@ -37,7 +34,6 @@ def mapping_parser(endpoint, mapping_file):
 	-------
 	A list of TriplesMap objects containing all the parsed rules from the original mapping file
 	"""
-
 	mapping_graph = rdflib.Graph()
 
 	try:
@@ -68,14 +64,14 @@ def mapping_parser(endpoint, mapping_file):
 	mapping_query_results = mapping_graph.query(mapping_query)
 	class_list = {}
 	json_file = []
-	json_name = "/DeTrusty/Config/rdfmts.json"
+	json_name = "/data/DeTrusty/Config/rdfmts.json"
 	for result_triples_map in mapping_query_results:
 		if str(result_triples_map.Class) not in class_list:
 			class_list[str(result_triples_map.Class)] = ""
 			if str(result_triples_map.range) != "None":
-				json_file.append({"rootType":str(result_triples_map.Class),"predicates":[{"predicate":str(result_triples_map.predicate),"range":[str(result_triples_map.range)]}]})
+				json_file.append({"rootType": str(result_triples_map.Class), "predicates": [{"predicate": str(result_triples_map.predicate), "range": [str(result_triples_map.range)]}]})
 			else:
-				json_file.append({"rootType":str(result_triples_map.Class),"predicates":[{"predicate":str(result_triples_map.predicate),"range":[]}]})
+				json_file.append({"rootType": str(result_triples_map.Class), "predicates": [{"predicate": str(result_triples_map.predicate), "range": []}]})
 		else:
 			for root in json_file:
 
@@ -88,15 +84,16 @@ def mapping_parser(endpoint, mapping_file):
 							new_predicate = False
 					if new_predicate:
 						if str(result_triples_map.range) != "None":
-							root["predicates"].append({"predicate":str(result_triples_map.predicate),"range":[str(result_triples_map.range)]})
+							root["predicates"].append({"predicate": str(result_triples_map.predicate), "range": [str(result_triples_map.range)]})
 						else:
-							root["predicates"].append({"predicate":str(result_triples_map.predicate),"range":[]})
+							root["predicates"].append({"predicate": str(result_triples_map.predicate), "range": []})
 
 	for root in json_file:
 		root["linkedTo"] = get_linked_to(root)
-		root["wrappers"] = [{"url":str(endpoint),"predicates":get_predicates(root),"urlparam":"","wrapperType":"SPARQLEndpoint"}]
+		root["wrappers"] = [{"url": str(endpoint), "predicates": get_predicates(root), "urlparam": "", "wrapperType":"SPARQLEndpoint"}]
 
 	json.dump(json_file, open(json_name, 'w+'))
 
+
 if __name__ == '__main__':
-	mapping_parser(str(sys.argv[1]),str(sys.argv[2]))
+	mapping_parser(str(sys.argv[1]), str(sys.argv[2]))
