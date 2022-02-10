@@ -579,7 +579,7 @@ def trust_generator(endpoint, mapping_file):
 	mapping_query_results = mapping_graph.query(mapping_query)
 	class_list = {}
 	json_file = []
-	json_name = "/DeTrusty/Config/rdfmts.json"
+	json_name = "/data/DeTrusty/Config/rdfmts.json"
 	for result_triples_map in mapping_query_results:
 		if str(result_triples_map.Class) not in class_list:
 			class_list[str(result_triples_map.Class)] = ""
