@@ -169,3 +169,15 @@ WHERE {
   } LIMIT 1000
 
 ```
+
+5. Configuring DeTrusty
+
+Generate the source description for DeTrusty:
+```bash
+docker exec -it sdmrdfizer python3 /data/scripts/mapping_parser.py http://${SPARQL_ENDPOINT_IP}:8890/sparql /path/to/your/mapping/file
+```
+
+Then tell DeTrusty to reload the configuration:
+```bash
+docker exec -it detrusty /DeTrusty/Scripts/restart_workers.sh
+```
