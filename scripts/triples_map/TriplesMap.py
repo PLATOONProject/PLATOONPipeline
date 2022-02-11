@@ -90,7 +90,7 @@ class SubjectMap:
 
 class PredicateObjectMap:
 	
-	def __init__(self, predicate_map, object_map):
+	def __init__(self, predicate_map, object_map, graph=None):
 
 		"""
 		Constructor of a PredicateObjectMap object
@@ -106,6 +106,7 @@ class PredicateObjectMap:
 
 		self.predicate_map = predicate_map
 		self.object_map = object_map
+		self.graph = graph
 
 class PredicateMap:
 

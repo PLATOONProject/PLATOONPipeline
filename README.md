@@ -174,7 +174,7 @@ WHERE {
 
 Generate the source description for DeTrusty:
 ```bash
-docker exec -it sdmrdfizer python3 /data/scripts/mapping_parser.py http://${SPARQL_ENDPOINT_IP}:8890/sparql /path/to/your/mapping/file
+docker exec -it sdmrdfizer python3 /data/scripts/mapping_parser.py /path/to/your/config/file
 ```
 
 Then tell DeTrusty to reload the configuration:
