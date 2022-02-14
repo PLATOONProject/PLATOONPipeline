@@ -36,7 +36,7 @@ number_of_datasets: 8
 output_folder: ${default:main_directory}/rdf-dump
 all_in_one_file: yes
 remove_duplicate: yes
-name: pilot2a-observation-data	
+name: observation-data	
 dbtype: mysql
 ```
 
@@ -214,6 +214,7 @@ docker exec -it detrusty /DeTrusty/Scripts/restart_workers.sh
 6. Executing Query with DeTrusty
 
 This API call is used to send a query to the federation and retrieve the result.
+Queries can be executed from [http://localhost:5000/sparql](http://localhost:5000/sparql).
 The result will be returned as a JSON (see example below).
 
 Example call:
