@@ -1,4 +1,4 @@
-# Pilot2A-Data-Integration
+# PLATOON Pipeline
 
 This repository contains basic settings for Pilot 2A Knowledge Graph. 
 
@@ -64,6 +64,16 @@ mapping: ${default:main_directory}/mappings/Wind-Farm/wind-farm.ttl
 
 ```
 
+In case that the data source is not a relational data base, the configuration file can written as follows:
+
+```bash
+
+[dataset1]
+name: pilot2a_wind_farm_props
+mapping: ${default:main_directory}/mappings/Wind-Farm/wind-farm.ttl
+
+```
+
 Note on the dataset number, `[dataset1]`, dataset number 1 out of 8 datasets in this configuration. Each dataset will have its own configuration param values. In the snippet above, we set the name of dataset (this name will be used if `all_in_one_file` param of the global param is set to `no`). Other settings include: `user` and `password` - user name and password of the user to access the database, `host`, `port`, and `db` - hostname, port and database name of the dataset (dataset1->wind_farm_props), and finally the `mapping` param specifies where the RML mapping rules file is located. RML mapping rules need to conform the [RML Spec](http://rml.io/specs/rml/).
 
 There need to be at least *8* unique names of `[dataset_n]` sections specifiying the parameters of each datasets in this configuration.
@@ -84,7 +94,7 @@ python3 -m pip install rdfizer
 
 ```bash
 
-cd Pilot2A-Data-Integration/
+cd PLATOONPipeline/
 python3 -m rdfizer -c config.ini
 
 ```
@@ -175,6 +185,23 @@ WHERE {
 Generate the source description for DeTrusty:
 ```bash
 docker exec -it sdmrdfizer python3 /data/scripts/mapping_parser.py /path/to/your/config/file
+```
+
+The configuration file for mapping_parser.py is similar to the configuration file of the SDM-RDFizer. The main differencce is that it requires the `endpoint`.
+Example:
+
+```bash
+      
+[default]
+main_directory: ./
+
+[datasets]
+number_of_datasets: 1
+endpoint: http://example.org
+
+[dataset1]
+name: pilot2a_wind_farm_props
+mapping: ${default:main_directory}/mappings/Wind-Farm/wind-farm.ttl
 ```
 
 Then tell DeTrusty to reload the configuration:
