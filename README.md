@@ -1,13 +1,15 @@
 # PLATOON Pipeline
 
-This repository contains basic settings for Pilot 2A Knowledge Graph. 
+This repository contains basic settings for PLATOON Pipeline. 
 
-- `mappings` - contains RML mappings of available Pilot 2A data sources using the `PLATOON` semantic data model v? .
 - `scripts` - contains scripts used for transforming sources to RDF and loading it to triple store (Virtuoso)
       - `virtuoso-script.sh`  - used to remotely connect and load data using `isql-v` tool of virtuoso on command line
       - `load_to_virtuos.py` - used to load the transformed RDF data to virtuoso using the `virtuoso-script.sh` script
       - `transform_and_load.py` - performs both transforming raw data to RDF and loading it virtuoso using the `virtuoso-script.sh` script
-- `config.ini` - configuration file for materializing the Knowledge Graph using [SDM-RDFizer](https://github.com/SDM-TIB/SDM-RDFizer).
+      - `mapping_parser.py` - generates the necessary file for the execution of DeTrusty
+- `configuration_files` - contains configuration files for the execution of the pipeline
+      - `config_rdfizer.ini` - configuration file for materializing the Knowledge Graph using [SDM-RDFizer](https://github.com/SDM-TIB/SDM-RDFizer).
+      - `config.ini` - configuration file for generating the DeTrusty configuration file.
 - `docker-compose.yml` - docker compose setup for transforming data to RDF and load it to `Virtuoso` triple store.
 
 # Creating RDF Dump using SDM-RDFizer
@@ -15,7 +17,7 @@ This repository contains basic settings for Pilot 2A Knowledge Graph.
 
 ## Configure (Data Source credentials, output location, etc)
 
-Edit `config.ini` file as follows:
+Edit `config_rdfizer.ini` file as follows:
 
 Set the main directory in the `[default]` section 
 
@@ -126,7 +128,7 @@ docker exec -it sdmrdfizer python3 -m rdfizer -c /data/config.ini
 
 ```
 
-This will create the RDF dumps according the configuration file, `config.ini`, and store the RDF dump in `/data/` volume, which in turn in "Pilot2A-Data-Integration/".
+This will create the RDF dumps according the configuration file, `config.ini`, and store the RDF dump in `/data/` volume, which in turn in "PLATOONPipeline/".
 You can find the raw RDF file in `.nt` serialization inside 
 
 - Load the RDF dump to Virtuoso
