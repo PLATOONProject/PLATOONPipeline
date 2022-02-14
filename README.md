@@ -111,7 +111,7 @@ The docker container created above using the docker-compose.yaml file will attac
 
 ```bash
 
-cd Pilot2A-Data-Integration/
+cd PLATOONPipeline/
 docker exec -it sdmrdfizer python3 -m rdfizer -c /data/config.ini 
 
 ```
@@ -130,7 +130,7 @@ docker exec -it sdmrdfizer python3 /data/scripts/load_to_virtuoso.py
 
 ```
 
-OR to stransofrm and load data automatically, run the following:
+OR to transform and load data automatically, run the following:
 
 ```bash
 
@@ -180,4 +180,56 @@ docker exec -it sdmrdfizer python3 /data/scripts/mapping_parser.py /path/to/your
 Then tell DeTrusty to reload the configuration:
 ```bash
 docker exec -it detrusty /DeTrusty/Scripts/restart_workers.sh
+```
+
+6. Executing Query with DeTrusty
+
+This API call is used to send a query to the federation and retrieve the result.
+The result will be returned as a JSON (see example below).
+
+Example call:
+
+```bash
+curl -X POST -d "query=SELECT ?s WHERE { ?s a <http://dbpedia.org/ontology/Scientist> } LIMIT 10" localhost:5000/sparql
+```
+
+Example output for the above query (shortened to two results):
+
+```yaml
+{
+  "cardinality": 10,
+  "execution_time": 0.1437232494354248,
+  "output_version": "2.0",
+  "head": { "vars": ["s"] },
+  "results": {
+    "bindings": [
+      {
+        "__meta__": { "is_verified": True },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/A.E._Dick_Howard"
+        }
+      },
+      {
+        "__meta__": { "is_verified": True },
+        "s": {
+          "type": "uri",
+          "value": "http://dbpedia.org/resource/A.F.P._Hulsewé"
+        }
+      },
+    ]
+  }
+}
+```
+'cardinality' is the number (integer) of results retrieved,
+'execution_time' (float) gives the time in seconds the query engine has spent collecting the results,
+'output_version' (string) indicates the version number of the output format, i.e., to differentiate the current output from possibly changed output in the future,
+'variables' (list) returns a list of the variables found in the query,
+'result' is a list of dictionaries containing the results of the query, using the variables as keys;
+metadata about the result verification is included in the key '\_\_meta\_\_'.
+The current version returns all results as verified as can be seen in the key 'is_verified' of the metadata.
+
+When sending a SPARQL 1.1 query with the SERVICE clause, use the following call:
+```bash
+curl -X POST -d "query=SELECT ?s WHERE { SERVICE <https://dbpedia.org/sparql> { ?s a <http://dbpedia.org/ontology/Scientist> }} LIMIT 10" -d "sparql1_1=True" localhost:5000/sparql
 ```
