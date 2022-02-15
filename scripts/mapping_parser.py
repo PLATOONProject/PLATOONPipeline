@@ -95,15 +95,14 @@ def concat_mapping(prefixes, db_source, mapping_list):
 					mapping += "<" + triples_map.triples_map_id.split("#")[1] + "_" + mapping_file.split(".")[0] + ">\n"
 				else: 
 					mapping += "<" + triples_map.triples_map_id.split("/")[len(triples_map.triples_map_id.split("/"))-1] + "_" + mapping_file.split(".")[0] + ">\n"
-				mapping += "    fnml:functionValue [\n"
-				mapping += "    rml:logicalSource [ rml:source \"" + triples_map.data_source +"\";\n"
-				if str(triples_map.file_format).lower() == "csv" and triples_map.query == "None": 
+				if str(triples_map.file_format).lower() == "csv" and triples_map.query == "None":
+					mapping += "    rml:logicalSource [ rml:source \"" + triples_map.data_source +"\";\n" 
 					mapping += "                rml:referenceFormulation ql:CSV\n"
 				else:
 					mapping += "    rml:logicalSource [ rml:source <DB_source>;\n"
 					mapping += "                        rr:tableName \"" + triples_map.tablename + "\";\n"
 					if triples_map.query != "None": 
-						mapping += "                rml:query \"" + triples_map.query +"\"\n" 
+						mapping += "                rml:query \"\"\"\"\"" + triples_map.query +"\"\"\"\"\"\n" 
 				mapping += "                ];\n"
 				po_exist = {}
 				for predicate_object in triples_map.predicate_object_maps_list:
@@ -151,14 +150,14 @@ def concat_mapping(prefixes, db_source, mapping_list):
 					mapping += "<" + triples_map.triples_map_id.split("/")[len(triples_map.triples_map_id.split("/"))-1] + "_" + mapping_file.split(".")[0] + ">\n"
 
 				mapping += "    a rr:TriplesMap;\n"
-				mapping += "    rml:logicalSource [ rml:source \"" + triples_map.data_source +"\";\n"
-				if str(triples_map.file_format).lower() == "csv" and triples_map.query == "None": 
+				if str(triples_map.file_format).lower() == "csv" and triples_map.query == "None":
+					mapping += "    rml:logicalSource [ rml:source \"" + triples_map.data_source +"\";\n" 
 					mapping += "                rml:referenceFormulation ql:CSV\n"
 				else:
 					mapping += "    rml:logicalSource [ rml:source <DB_source>;\n"
 					mapping += "                        rr:tableName \"" + triples_map.tablename + "\";\n"
 					if triples_map.query != "None": 
-						mapping += "                rml:query \"" + triples_map.query +"\"\n" 
+						mapping += "                rml:query \"\"\"" + triples_map.query +"\"\"\"\n" 
 				mapping += "                ];\n"
 
 
@@ -579,6 +578,7 @@ def trust_generator(endpoint, mapping_file):
 	mapping_query_results = mapping_graph.query(mapping_query)
 	class_list = {}
 	json_file = []
+	#json_name = "rdfmts.json"
 	json_name = "/data/DeTrusty/Config/rdfmts.json"
 	for result_triples_map in mapping_query_results:
 		if str(result_triples_map.Class) not in class_list:
@@ -606,7 +606,6 @@ def trust_generator(endpoint, mapping_file):
 	for root in json_file:
 		root["linkedTo"] = get_linked_to(root)
 		root["wrappers"] = [{"url":str(endpoint),"predicates":get_predicates(root),"urlparam":"","wrapperType":"SPARQLEndpoint"}]
-
 	json.dump(json_file, open(json_name, 'w+'))
 
 def main(config_file):
