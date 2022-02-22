@@ -578,8 +578,6 @@ def trust_generator(endpoint, mapping_file):
 	mapping_query_results = mapping_graph.query(mapping_query)
 	class_list = {}
 	json_file = []
-	#json_name = "rdfmts.json"
-	json_name = "/data/DeTrusty/Config/rdfmts.json"
 	for result_triples_map in mapping_query_results:
 		if str(result_triples_map.Class) not in class_list:
 			class_list[str(result_triples_map.Class)] = ""
@@ -606,9 +604,13 @@ def trust_generator(endpoint, mapping_file):
 	for root in json_file:
 		root["linkedTo"] = get_linked_to(root)
 		root["wrappers"] = [{"url":str(endpoint),"predicates":get_predicates(root),"urlparam":"","wrapperType":"SPARQLEndpoint"}]
-	json.dump(json_file, open(json_name, 'w+'))
+	return json_file
 
 def main(config_file):
+
+	json_file = []
+	#json_name = "rdfmts.json"
+	json_name = "/data/DeTrusty/Config/rdfmts.json"
 
 	if os.path.isfile(config_file) == False:
 		print("The configuration file " + config_file + " does not exist.")
@@ -624,15 +626,9 @@ def main(config_file):
 	temp_prefixes = ""
 	for dataset_number in range(int(config["datasets"]["number_of_datasets"])):
 		dataset_i = "dataset" + str(int(dataset_number) + 1)
-		mapping_name = config[dataset_i]["mapping"].split("/")[len(config[dataset_i]["mapping"].split("/"))-1]
-		mapping_list[mapping_name] = {}
-		mapping_list[mapping_name]["triples_map_list"] = mapping_parser(config[dataset_i]["mapping"])
-		mapping_list[mapping_name]["original"] = config[dataset_i]["mapping"]
-		temp_prefixes, db_source = prefix_generation(prefixes, db_source, config[dataset_i]["mapping"])
-		prefixes += temp_prefixes
+		json_file = json_file + trust_generator(config[dataset_i]["endpoint"],config[dataset_i]["mapping"])
 
-	concat_mapping(prefixes, db_source, mapping_list)
-	trust_generator(config["datasets"]["endpoint"],"concat_mapping.ttl")
+	json.dump(json_file, open(json_name, 'w+'))
 
 if __name__ == '__main__':
 	main(str(sys.argv[1]))
