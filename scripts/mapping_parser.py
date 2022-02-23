@@ -19,6 +19,35 @@ except:
 global prefixes
 prefixes = {}
 
+def have_endpoint(endpoint,dic_list):
+	for dic in dic_list:
+		if endpoint == dic["endpoint"]:
+			return False
+	return True
+
+def endpoint_association(endpoint, triples_map_list, endpoint_list):
+	for tm in triples_map_list:
+		if tm.subject_map.rdf_class != None:
+			dic = {}
+			predicates = []
+			dic["endpoint"] = endpoint
+			for po in tm.predicate_object_maps_list:
+				predicates.append(po.predicate_map.value)
+			dic["predicates"] = predicates
+			if tm.subject_map.rdf_class in endpoint_list:
+				if have_endpoint(endpoint,endpoint_list[tm.subject_map.rdf_class]):
+					endpoint_list[tm.subject_map.rdf_class].append(dic)
+				else:
+					i = 0
+					while i < len(endpoint_list[tm.subject_map.rdf_class]):
+						if endpoint == endpoint_list[tm.subject_map.rdf_class][i]["endpoint"]:
+							diff = set(dic["predicates"]) - set(endpoint_list[tm.subject_map.rdf_class][i]["predicates"])
+							endpoint_list[tm.subject_map.rdf_class][i]["predicates"] = endpoint_list[tm.subject_map.rdf_class][i]["predicates"] + list(diff)
+						i += 1
+			else:
+				endpoint_list[tm.subject_map.rdf_class] = [dic]
+	return endpoint_list
+
 def string_separetion(string):
 	if ("{" in string) and ("[" in string):
 		prefix = string.split("{")[0]
@@ -530,7 +559,7 @@ def mapping_parser(mapping_file):
 
 	return triples_map_list
 
-def trust_generator(endpoint, mapping_file):
+def trust_generator(endpoint_list, mapping_file, class_exist, json_file):
 
 	"""
 	(Private function, not accessible from outside this package)
@@ -576,18 +605,15 @@ def trust_generator(endpoint, mapping_file):
 			} ORDER BY ?Class """
 
 	mapping_query_results = mapping_graph.query(mapping_query)
-	class_list = {}
-	json_file = []
 	for result_triples_map in mapping_query_results:
-		if str(result_triples_map.Class) not in class_list:
-			class_list[str(result_triples_map.Class)] = ""
+		if str(result_triples_map.Class) not in class_exist:
+			class_exist[str(result_triples_map.Class)] = ""
 			if str(result_triples_map.range) != "None":
 				json_file.append({"rootType":str(result_triples_map.Class),"predicates":[{"predicate":str(result_triples_map.predicate),"range":[str(result_triples_map.range)]}]})
 			else:
 				json_file.append({"rootType":str(result_triples_map.Class),"predicates":[{"predicate":str(result_triples_map.predicate),"range":[]}]})
 		else:
 			for root in json_file:
-
 				if str(result_triples_map.Class) == root["rootType"]:
 					new_predicate = True
 					for predicate in root["predicates"]:
@@ -603,8 +629,11 @@ def trust_generator(endpoint, mapping_file):
 
 	for root in json_file:
 		root["linkedTo"] = get_linked_to(root)
-		root["wrappers"] = [{"url":str(endpoint),"predicates":get_predicates(root),"urlparam":"","wrapperType":"SPARQLEndpoint"}]
-	return json_file
+		wrappers = []
+		for endpoint in endpoint_list[root["rootType"]]:
+			wrappers.append({"url":endpoint["endpoint"],"predicates":endpoint["predicates"],"urlparam":"","wrapperType":"SPARQLEndpoint"})
+		root["wrappers"] = wrappers
+	return json_file, class_exist
 
 def main(config_file):
 
@@ -621,12 +650,17 @@ def main(config_file):
 	config.read(config_file)
 
 	mapping_list = {}
-	prefixes = ""
-	db_source = ""
-	temp_prefixes = ""
+	endpoint_list = {}
+	class_exist = {}
+
 	for dataset_number in range(int(config["datasets"]["number_of_datasets"])):
 		dataset_i = "dataset" + str(int(dataset_number) + 1)
-		json_file = json_file + trust_generator(config[dataset_i]["endpoint"],config[dataset_i]["mapping"])
+		triples_map_list = mapping_parser(config[dataset_i]["mapping"])
+		endpoint_list = endpoint_association(config[dataset_i]["endpoint"],triples_map_list,endpoint_list)
+
+	for dataset_number in range(int(config["datasets"]["number_of_datasets"])):
+		dataset_i = "dataset" + str(int(dataset_number) + 1)
+		json_file, class_exist = trust_generator(endpoint_list,config[dataset_i]["mapping"],class_exist,json_file)
 
 	json.dump(json_file, open(json_name, 'w+'))
 
