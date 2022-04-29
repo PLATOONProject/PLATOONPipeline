@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   sdmrdfizer:
-    image: asakor/sdmrdfizier:4.0.1
+    image: sdmtib/sdmrdfizer:4.3.6
     hostname: sdmrdfizer 
     container_name: sdmrdfizer
     domainname: platoon
