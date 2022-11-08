@@ -66,7 +66,7 @@ mapping: ${default:main_directory}/mappings/Wind-Farm/wind-farm.ttl
 
 ```
 
-In case that the data source is not a relational data base, the configuration file can written as follows:
+In case that the data source is not a relational data base, the configuration file can be written as follows:
 
 ```bash
 
