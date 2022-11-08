@@ -20,7 +20,7 @@ services:
       - RDF_DUMP_FOLDER_PATH=/data
 
   detrusty:
-    image: sdmtib/detrusty:0.2.0
+    image: sdmtib/detrusty:0.8.0
     hostname: detrusty
     container_name: detrusty
     domainname: platoon
