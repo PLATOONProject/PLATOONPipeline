@@ -6,10 +6,9 @@ This repository contains basic settings for PLATOON Pipeline.
       - `virtuoso-script.sh`  - used to remotely connect and load data using `isql-v` tool of virtuoso on command line
       - `load_to_virtuos.py` - used to load the transformed RDF data to virtuoso using the `virtuoso-script.sh` script
       - `transform_and_load.py` - performs both transforming raw data to RDF and loading it virtuoso using the `virtuoso-script.sh` script
-      - `mapping_parser.py` - generates the necessary file for the execution of DeTrusty
 - `configuration_files` - contains configuration files for the execution of the pipeline
       - `config_rdfizer.ini` - configuration file for materializing the Knowledge Graph using [SDM-RDFizer](https://github.com/SDM-TIB/SDM-RDFizer).
-      - `config.ini` - configuration file for generating the DeTrusty configuration file.
+      - `endpoints.json` - configuration file for generating the DeTrusty configuration file.
 - `docker-compose.yml` - docker compose setup for transforming data to RDF and load it to `Virtuoso` triple store.
 
 # Creating RDF Dump using SDM-RDFizer
@@ -186,24 +185,16 @@ WHERE {
 
 Generate the source description for DeTrusty:
 ```bash
-docker exec -it sdmrdfizer python3 /data/scripts/mapping_parser.py /path/to/your/config/file
+docker exec -it DeTrusty bash -c 'create_rdfmts.py -s /path/to/your/config/file -j'
 ```
 
-The configuration file for mapping_parser.py is similar to the configuration file of the SDM-RDFizer. The main differencce is that it requires the `endpoint`.
+The configuration file for create_rdfmts.py is a JSON mapping the endpoint URL to the mapping files.
 Example:
 
-```bash
-      
-[default]
-main_directory: ./
-
-[datasets]
-number_of_datasets: 1
-endpoint: http://example.org
-
-[dataset1]
-name: pilot2a_wind_farm_props
-mapping: ${default:main_directory}/mappings/Wind-Farm/wind-farm.ttl
+```JSON
+{
+  "http://example.org": { "mappings": ["/mappings/Wind-Farm/wind-farm.ttl"] }
+}
 ```
 
 Then tell DeTrusty to reload the configuration:
@@ -259,7 +250,7 @@ Example output for the above query (shortened to two results):
 metadata about the result verification is included in the key '\_\_meta\_\_'.
 The current version returns all results as verified as can be seen in the key 'is_verified' of the metadata.
 
-When sending a SPARQL 1.1 query with the SERVICE clause, use the following call:
+When sending a SPARQL 1.1 query with the SERVICE clause add the sparql1_1 parameter as in the following example call:
 ```bash
 curl -X POST -d "query=SELECT ?s WHERE { SERVICE <https://dbpedia.org/sparql> { ?s a <http://dbpedia.org/ontology/Scientist> }} LIMIT 10" -d "sparql1_1=True" localhost:5000/sparql
 ```

@@ -1,0 +1,4 @@
+{
+  "http://pilot2akg:8890/sparql": { "mappings": ["/data/path/to/mapping/file1"] },
+  "http://localhost:8890/sparql": { "mappings": ["/data/path/to/mapping/file2"] },
+}
