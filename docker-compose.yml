@@ -35,7 +35,7 @@ services:
       - pilot2akg
 
   pilot2akg:
-    image: kemele/virtuoso:6-stable
+    image: kemele/virtuoso:7-stable
     hostname: pilot2akg
     container_name: pilot2akg
     domainname: platoon
