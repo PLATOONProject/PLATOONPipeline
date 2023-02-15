@@ -1,6 +1,6 @@
 # PLATOON Pipeline
 
-This repository contains basic settings for PLATOON Pipeline. 
+This repository contains basic settings for PLATOON Pipeline; it has been implemented in WP2 as part of the activities of task T2.4. The outcomes of the assessment of this pipeline is reported in deliverables D2.4, D2.8, and D4.11. 
 
 - `scripts` - contains scripts used for transforming sources to RDF and loading it to triple store (Virtuoso)
       - `virtuoso-script.sh`  - used to remotely connect and load data using `isql-v` tool of virtuoso on command line
